@@ -11,10 +11,11 @@ class Node:
 class Astar:
 
     def __init__(self, start, end):
-        start.local    = 0
-        self.start     = start
-        self.end       = end
-        self.openSet   = [start]
+        start.local      = 0
+        self.start       = start
+        self.end         = end
+        self.openSet     = [start]
+        self.closedSet   = []
 
     def miniCostToEnd(self):
         print([i.name for i in sorted(self.openSet, key=lambda node: node.local)])
@@ -22,31 +23,31 @@ class Astar:
 
     @property
     def run(self):
-        while len(self.openSet) != 0:
+        while len(self.openSet) > 0:
             current = self.miniCostToEnd()
 
             print("visiting :", current.name)
 
             if current == self.end:
-                pass
+
+                prev = self.end
+                self.path = [prev]
+                while prev.parent != None:
+                    self.path.insert(0, prev.parent)
+                    prev = prev.parent
+                break
 
             self.openSet.remove(current)
+            self.closedSet.append(current)
 
             for neighbor, cost in current.neighbors.items():
+
                 if current.local + cost < neighbor.local:
                     neighbor.local = current.local + cost
                     neighbor.parent = current
                     if neighbor not in self.openSet:
                         self.openSet.append(neighbor)
 
-        prev = self.end
-        self.path = [self.end]
-        print("finish")
-        while prev.parent != None:
-            self.path.insert(0, prev.parent)
-            print(prev.name)
-            prev = prev.parent
-            break
         return {i.name: i.local for i in self.path}
 
 # create our nodes
@@ -62,5 +63,4 @@ d.neighbors = {c:2, e:5, f:1     }
 
 obj = Astar(a, d)
 print(obj.run) # result is {A, E, F, D}
-print(f.parent.name, e.parent.name)
 
